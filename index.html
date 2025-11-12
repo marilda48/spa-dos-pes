@@ -395,6 +395,122 @@
   let selectedServiceId = null;
   let selectedDate = null;
   let selectedTime = null;
+  
+// --- UTILITÁRIOS ---
+
+function loadBookings() {
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveBookings(list) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+function getTodayISO() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${year}-${month}-${day}`;
+}
+
+// --- AGENDAR ---
+function handleBooking() {
+  const feedback = document.getElementById("feedback");
+  feedback.textContent = "";
+  feedback.className = "msg";
+
+  if (!selectedServiceId) {
+    feedback.textContent = "Selecione um serviço antes de confirmar.";
+    feedback.classList.add("err");
+    return;
+  }
+  if (!selectedDate) {
+    feedback.textContent = "Selecione a data do atendimento.";
+    feedback.classList.add("err");
+    return;
+  }
+  if (!selectedTime) {
+    feedback.textContent = "Selecione o horário desejado.";
+    feedback.classList.add("err");
+    return;
+  }
+
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const notes = document.getElementById("notes").value.trim();
+
+  if (!name || !phone) {
+    feedback.textContent = "Informe seu nome e WhatsApp para confirmação.";
+    feedback.classList.add("err");
+    return;
+  }
+
+  const bookings = loadBookings();
+  const conflict = bookings.some(
+    b => b.date === selectedDate && b.time === selectedTime
+  );
+
+  if (conflict) {
+    feedback.textContent =
+      "Esse horário acabou de ser ocupado. Atualize a página e escolha outro horário.";
+    feedback.classList.add("err");
+    renderTimeSlots();
+    return;
+  }
+
+  const newBooking = {
+    id: Date.now(),
+    name,
+    phone,
+    notes,
+    date: selectedDate,
+    time: selectedTime,
+    serviceId: selectedServiceId
+  };
+
+  bookings.push(newBooking);
+  saveBookings(bookings);
+
+  // Mensagem de confirmação visual
+  feedback.textContent =
+    "Agendamento confirmado com sucesso! Clique para abrir o WhatsApp e finalizar a confirmação.";
+  feedback.classList.add("ok");
+
+  // Atualiza listas e horários
+  renderTimeSlots();
+  renderLists();
+
+  // Monta mensagem automática para o WhatsApp da clínica
+  const service = SERVICES.find(s => s.id === selectedServiceId);
+  const dataFormatada = selectedDate.split("-").reverse().join("/");
+  const whatsappNumber = "5595991671540"; // seu número
+
+  const mensagem = `
+Olá, Spa dos Pés! 🌸
+
+Novo agendamento:
+
+Cliente: ${name}
+WhatsApp do cliente: ${phone}
+Serviço: ${service ? service.nome : selectedServiceId}
+Data: ${dataFormatada}
+Horário: ${selectedTime}
+Observações: ${notes || "Nenhuma."}
+
+Por favor, confirme o atendimento. Obrigada!
+`;
+
+  const url = "https://wa.me/" + whatsappNumber + "?text=" + encodeURIComponent(mensagem);
+
+  // Abre o WhatsApp em uma nova aba/janela
+  window.open(url, "_blank");
+}
 
   // --- UTILITÁRIOS ---
 
@@ -682,3 +798,4 @@
 </script>
 </body>
 </html>
+
