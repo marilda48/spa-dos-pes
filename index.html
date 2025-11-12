@@ -673,72 +673,6 @@ Por favor, confirme o atendimento. Obrigada!
     }
   }
 
-  // --- AGENDAR ---
-
-  function handleBooking() {
-    const feedback = document.getElementById("feedback");
-    feedback.textContent = "";
-    feedback.className = "msg";
-
-    if (!selectedServiceId) {
-      feedback.textContent = "Selecione um serviço antes de confirmar.";
-      feedback.classList.add("err");
-      return;
-    }
-    if (!selectedDate) {
-      feedback.textContent = "Selecione a data do atendimento.";
-      feedback.classList.add("err");
-      return;
-    }
-    if (!selectedTime) {
-      feedback.textContent = "Selecione o horário desejado.";
-      feedback.classList.add("err");
-      return;
-    }
-
-    const name = document.getElementById("name").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const notes = document.getElementById("notes").value.trim();
-
-    if (!name || !phone) {
-      feedback.textContent = "Informe seu nome e WhatsApp para confirmação.";
-      feedback.classList.add("err");
-      return;
-    }
-
-    const bookings = loadBookings();
-    const conflict = bookings.some(
-      b => b.date === selectedDate && b.time === selectedTime
-    );
-
-    if (conflict) {
-      feedback.textContent =
-        "Esse horário acabou de ser ocupado. Atualize a página e escolha outro horário.";
-      feedback.classList.add("err");
-      renderTimeSlots();
-      return;
-    }
-
-    const newBooking = {
-      id: Date.now(),
-      name,
-      phone,
-      notes,
-      date: selectedDate,
-      time: selectedTime,
-      serviceId: selectedServiceId
-    };
-
-    bookings.push(newBooking);
-    saveBookings(bookings);
-
-    feedback.textContent =
-      "Agendamento confirmado com sucesso! Você receberá a confirmação pelo WhatsApp.";
-    feedback.classList.add("ok");
-
-    renderTimeSlots();
-    renderLists();
-  }
 
   // --- TABS ---
 
@@ -798,4 +732,5 @@ Por favor, confirme o atendimento. Obrigada!
 </script>
 </body>
 </html>
+
 
