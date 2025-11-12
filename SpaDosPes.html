@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Spa dos Pés - Agendamento Online</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --primary: #b388ff;
+      --primary-soft: #f4ecff;
+      --accent: #ffb6c1;
+      --bg: #f9fafb;
+      --text: #222;
+      --radius-xl: 20px;
+      --shadow-soft: 0 8px 20px rgba(0,0,0,0.06);
+      --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      padding: 16px 16px 32px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: var(--radius-xl);
+      padding: 16px 18px 18px;
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 16px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: #666;
+      margin: 1px 0 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      padding: 3px 7px;
+      background: var(--primary-soft);
+      border-radius: 999px;
+      color: #6b4cd8;
+      margin-top: 6px;
+    }
+
+    h2 {
+      font-size: 16px;
+      margin: 0 0 8px;
+      font-weight: 600;
+    }
+
+    label {
+      font-size: 12px;
+      display: block;
+      margin-bottom: 4px;
+      color: #555;
+    }
+
+    select, input, textarea {
+      width: 100%;
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid #e2e2e2;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s ease;
+      background: #fafafa;
+    }
+
+    select:focus, input:focus, textarea:focus {
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 2px rgba(179,136,255,0.12);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .services-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .service-item {
+      border-radius: 12px;
+      padding: 8px;
+      border: 1px solid #f0e9ff;
+      cursor: pointer;
+      background: #fff;
+      transition: all 0.2s ease;
+      font-size: 11px;
+    }
+
+    .service-item strong {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 2px;
+      color: #4b3ca6;
+    }
+
+    .service-item span {
+      display: block;
+      color: #777;
+    }
+
+    .service-item.active {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .time-slots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 6px 0 8px;
+    }
+
+    .slot {
+      padding: 6px 9px;
+      border-radius: 999px;
+      border: 1px solid #e0d7ff;
+      font-size: 11px;
+      cursor: pointer;
+      background: #fff;
+      transition: all 0.2s ease;
+    }
+
+    .slot:hover {
+      border-color: var(--primary);
+    }
+
+    .slot.selected {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .slot.disabled {
+      background: #f2f2f2;
+      color: #aaa;
+      border-color: #e5e5e5;
+      cursor: not-allowed;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: var(--shadow-soft);
+      margin-top: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.14);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .msg {
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    .msg.ok { color: #1b9448; }
+    .msg.err { color: #c62828; }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 6px 10px;
+      font-size: 11px;
+      border-radius: 999px;
+      border: 1px solid #e2dfff;
+      background: #f8f6ff;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .list {
+      margin-top: 4px;
+      font-size: 11px;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+
+    .booking-item {
+      padding: 6px 8px;
+      border-radius: 10px;
+      border: 1px solid #f0e9ff;
+      margin-bottom: 4px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .booking-item span.label {
+      font-size: 10px;
+      color: #888;
+    }
+
+    .booking-item strong {
+      font-size: 11px;
+      color: #4b3ca6;
+    }
+
+    .no-data {
+      font-size: 10px;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 400px) {
+      .title { font-size: 18px; }
+      h2 { font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <!-- Cabeçalho -->
+  <div class="card">
+    <div class="header">
+      <div class="logo-circle">P</div>
+      <div>
+        <h1 class="title">Spa dos Pés - Agende Online</h1>
+        <p class="subtitle">Conforto, cuidado e bem-estar em cada sessão.</p>
+        <div class="badge">✔ Agendamento rápido · ✔ Confirmação imediata</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Seleção de serviço -->
+  <div class="card">
+    <h2>1. Escolha o serviço</h2>
+    <div id="services" class="services-list">
+      <!-- itens gerados via JS -->
+    </div>
+    <p id="selectedServiceInfo" class="msg"></p>
+  </div>
+
+  <!-- Data e horário -->
+  <div class="card">
+    <h2>2. Escolha data e horário</h2>
+    <label for="date">Data da sessão</label>
+    <input type="date" id="date" />
+
+    <label>Horários disponíveis</label>
+    <div id="timeSlots" class="time-slots"></div>
+    <p id="dateTimeMsg" class="msg"></p>
+  </div>
+
+  <!-- Dados do cliente -->
+  <div class="card">
+    <h2>3. Seus dados</h2>
+    <label for="name">Nome completo</label>
+    <input type="text" id="name" placeholder="Digite seu nome" />
+
+    <label for="phone">WhatsApp</label>
+    <input type="tel" id="phone" placeholder="(DDD) 9 0000-0000" />
+
+    <label for="notes">Observações (opcional)</label>
+    <textarea id="notes" placeholder="Ex: dor específica, sensibilidade, preferências..."></textarea>
+
+    <button class="btn" id="bookBtn">Confirmar agendamento</button>
+    <p id="feedback" class="msg"></p>
+  </div>
+
+  <!-- Lista de agendamentos -->
+  <div class="card">
+    <div class="tabs">
+      <button class="tab-btn active" id="tabCliente">Meus agendamentos</button>
+      <button class="tab-btn" id="tabAdmin">Visão da clínica</button>
+    </div>
+    <div id="listCliente" class="list"></div>
+    <div id="listAdmin" class="list" style="display:none;"></div>
+  </div>
+</div>
+
+<script>
+  // --- CONFIGURAÇÃO DO "SPA DOS PÉS" ---
+
+  const SERVICES = [
+    {
+      id: "spa_basico",
+      nome: "Spa dos Pés Clássico",
+      duracao: 40,
+      preco: 70,
+      desc: "Higienização, esfoliação suave, hidratação e massagem relaxante."
+    },
+    {
+      id: "spa_premium",
+      nome: "Spa Premium dos Pés",
+      duracao: 60,
+      preco: 110,
+      desc: "Banho relaxante, esfoliação profunda, máscara nutritiva e reflexologia."
+    },
+    {
+      id: "reflexologia",
+      nome: "Reflexologia Podal",
+      duracao: 45,
+      preco: 90,
+      desc: "Massagem terapêutica focada em pontos reflexos dos pés."
+    },
+    {
+      id: "combo",
+      nome: "Combo Spa + Reflexo",
+      duracao: 80,
+      preco: 150,
+      desc: "Tratamento completo para descanso profundo e equilíbrio."
+    }
+  ];
+
+  const TIME_SLOTS = [
+    "09:00","10:00","11:00",
+    "13:00","14:00","15:00",
+    "16:00","17:00"
+  ];
+
+  const STORAGE_KEY = "spa_pes_agendamentos_v1";
+
+  let selectedServiceId = null;
+  let selectedDate = null;
+  let selectedTime = null;
+
+  // --- UTILITÁRIOS ---
+
+  function loadBookings() {
+    try {
+      const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      return Array.isArray(data) ? data : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveBookings(list) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  }
+
+  function getTodayISO() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    return `${year}-${month}-${day}`;
+  }
+
+  // --- RENDERIZAÇÃO DE SERVIÇOS ---
+
+  function renderServices() {
+    const container = document.getElementById("services");
+    container.innerHTML = "";
+    SERVICES.forEach(service => {
+      const div = document.createElement("div");
+      div.className = "service-item";
+      div.dataset.id = service.id;
+      div.innerHTML = `
+        <strong>${service.nome}</strong>
+        <span>${service.duracao} min · R$ ${service.preco}</span>
+        <span>${service.desc}</span>
+      `;
+      div.addEventListener("click", () => {
+        selectedServiceId = service.id;
+        document
+          .querySelectorAll(".service-item")
+          .forEach(el => el.classList.remove("active"));
+        div.classList.add("active");
+        document.getElementById("selectedServiceInfo").textContent =
+          `Selecionado: ${service.nome} (${service.duracao} min · R$ ${service.preco})`;
+      });
+      container.appendChild(div);
+    });
+  }
+
+  // --- RENDERIZAÇÃO DE HORÁRIOS ---
+
+  function renderTimeSlots() {
+    const container = document.getElementById("timeSlots");
+    container.innerHTML = "";
+
+    if (!selectedDate) {
+      document.getElementById("dateTimeMsg").textContent =
+        "Escolha uma data para ver os horários disponíveis.";
+      return;
+    }
+
+    const bookings = loadBookings();
+    const dayBookings = bookings.filter(b => b.date === selectedDate);
+
+    TIME_SLOTS.forEach(time => {
+      const isTaken = dayBookings.some(b => b.time === time);
+      const btn = document.createElement("div");
+      btn.textContent = time;
+      btn.className = "slot";
+      if (isTaken) {
+        btn.classList.add("disabled");
+      } else {
+        btn.addEventListener("click", () => {
+          if (btn.classList.contains("disabled")) return;
+          selectedTime = time;
+          document
+            .querySelectorAll(".slot")
+            .forEach(el => el.classList.remove("selected"));
+          btn.classList.add("selected");
+          document.getElementById("dateTimeMsg").textContent =
+            `Horário selecionado: ${selectedDate.split("-").reverse().join("/")} às ${time}`;
+        });
+      }
+      container.appendChild(btn);
+    });
+
+    if (!TIME_SLOTS.some(t => !dayBookings.some(b => b.time === t))) {
+      document.getElementById("dateTimeMsg").textContent =
+        "Todos os horários estão ocupados nesse dia. Escolha outra data.";
+    } else {
+      if (!selectedTime) {
+        document.getElementById("dateTimeMsg").textContent =
+          "Toque em um horário para selecionar sua sessão.";
+      }
+    }
+  }
+
+  // --- LISTAS (CLIENTE & ADMIN) ---
+
+  function renderLists() {
+    const bookings = loadBookings().sort((a,b) => {
+      const da = a.date + " " + a.time;
+      const db = b.date + " " + b.time;
+      return da.localeCompare(db);
+    });
+
+    const listCliente = document.getElementById("listCliente");
+    const listAdmin = document.getElementById("listAdmin");
+    const nameInput = document.getElementById("name");
+    const clientName = (nameInput.value || "").trim().toLowerCase();
+
+    listCliente.innerHTML = "";
+    listAdmin.innerHTML = "";
+
+    const myBookings = clientName
+      ? bookings.filter(b => b.name.toLowerCase() === clientName)
+      : [];
+
+    if (myBookings.length === 0) {
+      listCliente.innerHTML =
+        '<div class="no-data">Informe seu nome acima e faça um agendamento para ver aqui.</div>';
+    } else {
+      myBookings.forEach(b => {
+        const service = SERVICES.find(s => s.id === b.serviceId);
+        const item = document.createElement("div");
+        item.className = "booking-item";
+        item.innerHTML = `
+          <span class="label">Data & horário</span>
+          <strong>${b.date.split("-").reverse().join("/")} · ${b.time}</strong>
+          <span class="label">Serviço</span>
+          <span>${service ? service.nome : b.serviceId}</span>
+          <span class="label">Status</span>
+          <span>Confirmado</span>
+        `;
+        listCliente.appendChild(item);
+      });
+    }
+
+    if (bookings.length === 0) {
+      listAdmin.innerHTML =
+        '<div class="no-data">Nenhum agendamento ainda. Divulgue seu link para começar a receber clientes. 💜</div>';
+    } else {
+      bookings.forEach(b => {
+        const service = SERVICES.find(s => s.id === b.serviceId);
+        const item = document.createElement("div");
+        item.className = "booking-item";
+        item.innerHTML = `
+          <span class="label">Data</span>
+          <strong>${b.date.split("-").reverse().join("/")} · ${b.time}</strong>
+          <span class="label">Cliente</span>
+          <span>${b.name} · ${b.phone}</span>
+          <span class="label">Serviço</span>
+          <span>${service ? service.nome : b.serviceId}</span>
+          ${b.notes ? `<span class="label">Obs.</span><span>${b.notes}</span>` : ""}
+        `;
+        listAdmin.appendChild(item);
+      });
+    }
+  }
+
+  // --- AGENDAR ---
+
+  function handleBooking() {
+    const feedback = document.getElementById("feedback");
+    feedback.textContent = "";
+    feedback.className = "msg";
+
+    if (!selectedServiceId) {
+      feedback.textContent = "Selecione um serviço antes de confirmar.";
+      feedback.classList.add("err");
+      return;
+    }
+    if (!selectedDate) {
+      feedback.textContent = "Selecione a data do atendimento.";
+      feedback.classList.add("err");
+      return;
+    }
+    if (!selectedTime) {
+      feedback.textContent = "Selecione o horário desejado.";
+      feedback.classList.add("err");
+      return;
+    }
+
+    const name = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const notes = document.getElementById("notes").value.trim();
+
+    if (!name || !phone) {
+      feedback.textContent = "Informe seu nome e WhatsApp para confirmação.";
+      feedback.classList.add("err");
+      return;
+    }
+
+    const bookings = loadBookings();
+    const conflict = bookings.some(
+      b => b.date === selectedDate && b.time === selectedTime
+    );
+
+    if (conflict) {
+      feedback.textContent =
+        "Esse horário acabou de ser ocupado. Atualize a página e escolha outro horário.";
+      feedback.classList.add("err");
+      renderTimeSlots();
+      return;
+    }
+
+    const newBooking = {
+      id: Date.now(),
+      name,
+      phone,
+      notes,
+      date: selectedDate,
+      time: selectedTime,
+      serviceId: selectedServiceId
+    };
+
+    bookings.push(newBooking);
+    saveBookings(bookings);
+
+    feedback.textContent =
+      "Agendamento confirmado com sucesso! Você receberá a confirmação pelo WhatsApp.";
+    feedback.classList.add("ok");
+
+    renderTimeSlots();
+    renderLists();
+  }
+
+  // --- TABS ---
+
+  function initTabs() {
+    const tabCliente = document.getElementById("tabCliente");
+    const tabAdmin = document.getElementById("tabAdmin");
+    const listCliente = document.getElementById("listCliente");
+    const listAdmin = document.getElementById("listAdmin");
+
+    tabCliente.addEventListener("click", () => {
+      tabCliente.classList.add("active");
+      tabAdmin.classList.remove("active");
+      listCliente.style.display = "block";
+      listAdmin.style.display = "none";
+    });
+
+    tabAdmin.addEventListener("click", () => {
+      tabAdmin.classList.add("active");
+      tabCliente.classList.remove("active");
+      listCliente.style.display = "none";
+      listAdmin.style.display = "block";
+    });
+  }
+
+  // --- INICIALIZAÇÃO ---
+
+  function init() {
+    // Serviços
+    renderServices();
+
+    // Data mínima = hoje
+    const dateInput = document.getElementById("date");
+    dateInput.min = getTodayISO();
+    dateInput.addEventListener("change", e => {
+      selectedDate = e.target.value;
+      selectedTime = null;
+      renderTimeSlots();
+    });
+
+    // Botão agendar
+    document.getElementById("bookBtn").addEventListener("click", handleBooking);
+
+    // Atualiza listas quando digitar nome (para "Meus agendamentos")
+    document.getElementById("name").addEventListener("input", () => {
+      renderLists();
+    });
+
+    // Tabs
+    initTabs();
+
+    // Render inicial
+    renderTimeSlots();
+    renderLists();
+  }
+
+  init();
+</script>
+</body>
+</html>
